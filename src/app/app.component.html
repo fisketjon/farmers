@@ -1,0 +1,773 @@
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<div style="width: 2200px;">
+  <div class="row">
+    <div style="padding-left: 30px; width:150; font-size: 36px">Juvesen</div>
+    <div class="row" style="width: 1400px; margin-top: 10px">
+      <div style="width: 70px; margin-left: 150px">Visning:</div>
+      <div><button style="width: 100px; margin-right: 8px" [ngStyle]="{'background-color': option === '1' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="option='1'">Turneringer</button></div>
+      <div><button style="width: 100px; margin-right: 8px" [ngStyle]="{'background-color': option === '2' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="option='2'">Plasseringer</button></div>
+      <div><button style="width: 100px; margin-right: 8px" [ngStyle]="{'background-color': option === '3' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="showAllPlayers()">{{this.players.length}} spillere</button></div>
+      <div><button style="width: 100px; margin-right: 30px" [ngStyle]="{'background-color': option === '4' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="option='4'">Statistikk</button></div>
+      <div [hidden]="option !== '1'">
+        <div class="row">
+          <div style="width: 90px;">Detaljnivå:</div>
+          <div><button style="width: 70px; margin-right: 8px" [ngStyle]="{'background-color': detail === '1' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="detail='1'">Vinnere</button></div>
+          <div><button style="width: 70px; margin-right: 8px" [ngStyle]="{'background-color': detail === '2' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="detail='2'">Finalister</button></div>
+          <div><button style="width: 70px; margin-right: 30px" [ngStyle]="{'background-color': detail === '3' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="detail='3'">Topp 3</button></div>
+        </div>
+      </div>
+      <div style="width: 70px;">Klasser:</div>
+      <div><button style="width: 50px; margin-right: 8px" [ngStyle]="{'background-color': allcls ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="allClasses()">Alle</button></div>
+      <div><button style="width: 120px; margin-right: 8px" [ngStyle]="{'background-color': !allcls ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="pureJuvesen()">Kun A-F single</button></div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="option === '1'">
+  <table style="width: 2200px;">
+    <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let obj of winners; let index=index;">
+      <div class="card" [hidden]="filterPlayer(index)" style="border-color: black; border-left-width: 0px; border-right-width: 0px; border-top-width: 0px; 
+        border-bottom-right-radius: 0%; border-bottom-left-radius: 0%; border-bottom-width: 2px; padding-top: 0px; padding-bottom: 2px">
+        <tr class="row" style="padding-left: 30px">    
+          <td class="card noborder">
+            <div class="card tournament {{obj.season}}" [ngStyle]="{'height': detail === '1' ? '39px' : detail === '2' ? '60px' : '102px'}" 
+              data-toggle="tooltip" data-placement="top" title="{{obj.comment}}">
+              {{obj.trn}}
+              <div class="row" style="margin-top: -4px; padding-left: 15px">
+                <div style="width: 125px;"><small>{{obj.dt}}</small></div>
+                <div *ngIf="!obj.full">
+                  <div style="width: 20px" [hidden]="!obj.klasser"><a href="javascript:void(0)" class="stretched-link" (click)="toggleTourn(index)"><fa-icon [icon]="faAngleDown"></fa-icon></a></div>
+                </div>
+                <div *ngIf="obj.full">
+                  <div style="width: 20px" [hidden]="!obj.klasser"><a href="javascript:void(0)" class="stretched-link" (click)="toggleTourn(index)"><fa-icon [icon]="faAngleUp"></fa-icon></a></div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="card noborder" style="margin: 0px">
+            <div class="tclass">{{obj.lbla}}</div>
+            <div class="gold player2" style="margin-top: 0px;">{{obj.a}}</div>
+            <div class="silver player2" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.a2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.a3a">3. {{obj.a3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.a3b">3. {{obj.a3b}}</div>
+          </td>
+          <div *ngIf="obj.b">
+            <td class="card noborder">
+              <div class="tclass">{{obj.lblb}}</div>
+              <div class="card gold player2" style="margin-top: 0px" [hidden]="!obj.b">{{obj.b}}</div>
+              <div class="silver player2" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.b2}}</div>
+              <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.b3a">3. {{obj.b3a}}</div>
+              <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.b3b">3. {{obj.b3b}}</div>
+            </td>
+          </div>
+          <div *ngIf="!obj.b && obj.w">
+            <td class="card noborder">
+              <div class="tclass">{{obj.lblw}}</div>
+              <div class="card gold player2" style="margin-top: 0px" [hidden]="!obj.w">{{obj.w}}</div>
+              <div class="silver player2" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.w2}}</div>
+              <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.w3a">3. {{obj.w3a}}</div>
+              <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.w3b">3. {{obj.w3b}}</div>
+            </td>
+          </div>
+          <div *ngIf="!obj.b && !obj.w">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.c">
+            <div class="tclass">{{labels.lblc}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.c}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.c2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.c3a">3. {{obj.c3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.c3b">3. {{obj.c3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.c"></td> -->
+          <div [hidden]="obj.c">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.d">
+            <div class="tclass">{{labels.lbld}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.d}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.d2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.d3a" >3. {{obj.d3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.d3b">3. {{obj.d3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.d"></td> -->
+          <div [hidden]="obj.d">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.e">
+            <div class="tclass">{{labels.lble}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.e}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.e2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.e3a" >3. {{obj.e3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.e3b">3. {{obj.e3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.e"></td> -->
+          <div [hidden]="obj.e">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.f">
+            <div class="tclass">{{labels.lblf}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.f}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.f2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.f3a" >3. {{obj.f3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.f3b">3. {{obj.f3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.f"></td> -->
+          <div [hidden]="obj.f">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.g || !allcls">
+            <div class="tclass">{{obj.lblg}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.g}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.g2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.g3a" >3. {{obj.g3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.g3b">3. {{obj.g3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.g"></td> -->
+          <div [hidden]="obj.g || !allcls">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.h || !allcls">
+            <div class="tclass">{{obj.lblh}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.h}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.h2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.h3a" >3. {{obj.h3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.h3b">3. {{obj.h3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.h"></td> -->
+          <div [hidden]="obj.h || !allcls">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.i || !allcls">
+            <div class="tclass">{{obj.lbli}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.i}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.i2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.i3a" >3. {{obj.i3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.i3b">3. {{obj.i3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.i"></td> -->
+          <div [hidden]="obj.i || !allcls">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+          <td class="card noborder" [hidden]="!obj.j || !allcls">
+            <div class="tclass">{{obj.lblj}}</div>
+            <div class="card gold player" style="margin-top: 0px;">{{obj.j}}</div>
+            <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.j2}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.j3a" >3. {{obj.j3a}}</div>
+            <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.j3b">3. {{obj.j3b}}</div>
+          </td>
+          <!-- <td class="card empty player noborder" [hidden]="obj.j"></td> -->
+          <div [hidden]="obj.j || !allcls">
+            <td class="card noborder">
+              <div class="tclass"></div>
+            </td>
+          </div>
+        </tr>
+        <tr *ngIf="obj.full">
+          <td><div style="width: 148px;"></div></td>
+          <td>
+            <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let art of obj.articles;">              
+              <div class="row" width="100%">
+                <div *ngFor="let img of art.images;">
+                  <div style="width: 404px">
+                    <div>
+                      <a href="http://www.fisketjon.no/stk/{{img.url}}" target="_blank">
+                        <img style="max-width: 400px; max-height: 300px; margin: 2px; padding: 0; object-fit: contain; text-align: center;" src="http://www.fisketjon.no/stk/{{img.url}}">
+                      </a>
+                    </div>
+                    <div style="width: 400px; overflow-wrap: break-word; margin-left: 14px" innerHTML="{{img.caption}}"></div>
+                  </div>
+                </div>
+              </div>
+              <h3>{{art.title}}</h3>
+              <div style="width: 800px; font-size: 14px; font-weight: bold" class="bodytxt1" innerHTML="{{art.ingress}}"></div>
+              <div *ngIf="art.author" style="font-size: 12px; margin-top: 8px">Skrevet av <strong>{{art.author}}</strong> den {{art.datew}}</div>
+              <div *ngIf="!art.author" style="font-size: 12px; margin-top: 8px">Skrevet den {{art.datew}}</div>
+              <div style="width: 800px; margin-top: 8px" class="bodytxt1" innerHTML="{{imagelinks(art.body)}}"></div>
+            </div>
+            <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let klasse of obj.klasser; let index1=index;">
+              <div *ngIf="!index1 && obj.comment" style="color: red; padding-left: 12px; white-space: pre-wrap">{{obj.comment}}</div>
+              <div class="row" style="padding-left: 26px">    
+                <div *ngIf="klasseOK(klasse.cls, true)" class="tclass" style="background-color: lightgrey;"><a href="javascript:void(0)" (click)="toggleKlasse(index, index1)" >{{klasse.cls}}</a></div>
+                <div>
+                  <div *ngIf="!klasse.expanded && klasseOK(klasse.cls, true)">
+                    <div style="width: 200px">{{klasse.kamper.length}} kamper</div>
+                  </div>
+                  <div *ngIf="klasse.expanded">
+                    <div class="row" style="padding-left: 22px">    
+                      <div style="width: 50px"><strong>Runde</strong></div>
+                      <div style="width: 150px"><strong>Dato / tid</strong></div>
+                      <div style="width: 420px"></div>
+                      <div style="width: 150px"><strong>Resultat</strong></div>
+                    </div>
+                    <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let kamp of klasse.kamper; let index2=index;">
+                      <div class="row">    
+                        <div *ngIf="!isDouble(kamp)">
+                          <div class="row" style="padding-left: 30px">    
+                            <div style="width: 8px"></div>
+                            <div style="width: 50px;" data-toggle="tooltip" data-placement="top" title="RR - Round Robin (Gruppespill)
+RR1-3 eller andre tall med strek mellom er plasseringskamper i gruppespill
+QF - Quarter final (Kvartfinale)
+SF - Semifinale
+F  - Finale
+5-9 eller andre tall med strek mellom er plasseringskamper i et såkalt kompasstablå
+">{{kamp.r}}</div>
+                            <div style="width: 150px;">{{kamp.dt}}</div>
+                            <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 1 ? 'bold' : 'normal'}">{{kamp.p1}}</div>
+                            <div style="width: 20px">-</div>
+                            <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 2 ? 'bold' : 'normal'}">{{kamp.p2}}</div>
+                            <div style="width: 250px">
+                              <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let set of kamp.res; let index3=index;">
+                                <div style="float: left; padding-right: 8px" [ngStyle]="{'padding-top': isDouble(kamp) ? '0.8em' : '0'}">{{removeWOName(set)}}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div *ngIf="isDouble(kamp)">
+                          <div class="card" style="margin-left: 16px">
+                            <div class="row" style="padding-left: 21px">    
+                              <div style="width: 50px; padding-top: 0.8em">{{kamp.r}}</div>
+                              <div style="width: 150px; padding-top: 0.8em">{{kamp.dt}}</div>
+                              <div>
+                                <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 1 ? 'bold' : 'normal'}">{{kamp.p1}}</div>
+                                <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 1 ? 'bold' : 'normal'}">{{kamp.p1b}}</div>
+                              </div>
+                              <div style="width: 20px">-</div>
+                              <div>
+                                <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 2 ? 'bold' : 'normal'}">{{kamp.p2}}</div>
+                                <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 2 ? 'bold' : 'normal'}">{{kamp.p2b}}</div>
+                              </div>
+                              <div style="width: 250px">
+                                <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let set of kamp.res; let index3=index;">
+                                  <div style="float: left; padding-right: 8px" [ngStyle]="{'padding-top': isDouble(kamp) ? '0.8em' : '0'}">{{removeWOName(set)}}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>  
+                </div>
+              </div>
+            </div>            
+          </td>
+        </tr>
+      </div>
+    </div>
+  </table>
+</div>
+<div *ngIf="option === '2'">
+  <div class="row">
+      <div [ngStyle]="{'width': allcls ? '810px' : '690px'}">
+      <table style="width: 100%;">
+          <tr>
+            <div class="row" style="padding-left:30px">
+              <td style="width: 198px"></td>
+              <td style="width: 60px" class="text-center">A</td>
+              <td style="width: 60px; margin-left: 8px" class="text-center">B</td>
+              <td style="width: 60px; margin-left: 8px" class="text-center">C</td>
+              <td style="width: 60px; margin-left: 8px" class="text-center">D</td>
+              <td style="width: 60px; margin-left: 8px" class="text-center">E</td>
+              <td style="width: 60px; margin-left: 8px" class="text-center">F</td>
+              <td [hidden]="!allcls" style="width: 60px; margin-left: 8px" class="text-center">U12</td>
+              <td [hidden]="!allcls" style="width: 60px; margin-left: 8px" class="text-center">U10</td>
+              <td style="width: 30px; margin-left: 8px" class="text-center">Tot</td>
+            </div>
+          </tr>
+        <div style="height: calc(100vh - 150px); overflow-y: scroll; overflow-x: hidden;">
+          <div [ngClass]="{true: 'selectedRow', false: ''}[index == currentidx]" *ngFor="let obj of toplist; let index=index;">
+            <tr class="card">
+              <div class="row" style="padding-left:30px">
+                <td class="gold player">{{obj.nm}}</td>        
+                <td style="width: 20px" class="gold text-center">{{obj.victories[0]}}</td>
+                <td style="width: 20px" class="silver text-center">{{obj.victories[1]}}</td>
+                <td style="width: 20px" class="bronze text-center">{{obj.victories[2]}}</td>
+                <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[3]}}</td>
+                <td style="width: 20px" class="silver text-center">{{obj.victories[4]}}</td>
+                <td style="width: 20px" class="bronze text-center">{{obj.victories[5]}}</td>
+                <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[6]}}</td>
+                <td style="width: 20px" class="silver text-center">{{obj.victories[7]}}</td>
+                <td style="width: 20px" class="bronze text-center">{{obj.victories[8]}}</td>
+                <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[9]}}</td>
+                <td style="width: 20px" class="silver text-center">{{obj.victories[10]}}</td>
+                <td style="width: 20px" class="bronze text-center">{{obj.victories[11]}}</td>
+                <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[12]}}</td>
+                <td style="width: 20px" class="silver text-center">{{obj.victories[13]}}</td>
+                <td style="width: 20px" class="bronze text-center">{{obj.victories[14]}}</td>
+                <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[15]}}</td>
+                <td style="width: 20px" class="silver text-center">{{obj.victories[16]}}</td>
+                <td style="width: 20px" class="bronze text-center">{{obj.victories[17]}}</td>
+                <td [hidden]="!allcls" style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[18]}}</td>
+                <td [hidden]="!allcls" style="width: 20px" class="silver text-center">{{obj.victories[19]}}</td>
+                <td [hidden]="!allcls" style="width: 20px" class="bronze text-center">{{obj.victories[20]}}</td>
+                <td [hidden]="!allcls" style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[21]}}</td>
+                <td [hidden]="!allcls" style="width: 20px" class="silver text-center">{{obj.victories[22]}}</td>
+                <td [hidden]="!allcls" style="width: 20px" class="bronze text-center">{{obj.victories[23]}}</td>
+                <td style="width: 30px; margin-left: 4px" class="text-right">{{obj.tot}}</td>
+              </div>
+            </tr>
+          </div>
+        </div>
+      </table>
+    </div>
+    <div style="width: calc(100% - 860px); padding-top: 20px">
+      <div id="plasseringer" class="carousel slide" data-ride="carousel" data-interval="1000">
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+          <li data-target="#plasseringer" data-slide-to="0" class="active"></li>
+          <li data-target="#plasseringer" data-slide-to="1"></li>
+        </ul>
+
+        <!-- The slideshow -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="juvesen/assets/20180427_152609_0001_7D_0009621_693.jpg" width="100%" alt="Rikhard Holmström">
+            <div class="carousel-caption">
+              <h3>Rikhard Holmström</h3>
+              <p>Juvesen Vårcup 2018</p>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <img src="juvesen/assets/20190908_130406_0001_7D_0004466_693.jpg" width="100%" alt="Robin McClusky">
+            <div class="carousel-caption">
+              <h3>Robin McClusky</h3>
+              <p>Juvesen Høstcup 2019</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Left and right controls -->
+        <a class="carousel-control-prev" href="#plasseringer" data-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#plasseringer" data-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="option === '3'" style="font-size: 14px;">
+  <h5 style="padding-left: 30px">{{winners.length}} turneringer med {{this.matches}} kamper, men bonuskamper er ikke med i tabellen</h5>
+  <table>
+      
+    <tr><td [ngStyle]="{'width': allcls ? '1000px' : '632px'}">
+      <div class="row">
+        <div style="width: 150px; margin-left: 45px; margin-right: 100">
+          <div *ngIf="sortbyfirstname" class="text-center" style="padding: 2px; color: white; background-color: blue; cursor: default;" (click)="sortplayers()">Sortér på fornavn</div>
+          <div *ngIf="!sortbyfirstname" class="text-center" style="padding: 2px; color: white; background-color: blue; cursor: default;" (click)="sortplayers()">Sortér på etternavn</div>
+        </div>
+        <div class="text-center" style="width: 360px"><strong>S I N G L E</strong></div>
+        <div *ngIf="allcls" class="text-center" style="width: 360px"><strong>D O U B L E</strong></div>
+      </div>
+      <div class="row">
+        <div style="width: 200px; margin-left: 45px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+        <div *ngIf="allcls" class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div *ngIf="allcls" class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div *ngIf="allcls" class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div *ngIf="allcls" class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div style="height: calc(100vh - 150px); overflow-y: scroll; overflow-x: hidden;">
+        <div *ngFor="let pl of players; let index=index; let odd=odd, let even=even">
+          <div class="row" [ngClass]="{ odd: odd, even: even }">
+            <div *ngIf="!pl.imagename" style="width: 20px; margin-left: 25px">&nbsp;</div>
+            <div *ngIf="pl.imagename" style="width: 20px; margin-left: 25px"><fa-icon [icon]="faFileImage"></fa-icon></div>
+            <div style="width: 200px"><a href="javascript:void(0)" [ngStyle]="{'color': pl.tournaments[0].trn === 'Vårcup 2023' ? 'black' : 'black'}" (click)="getPlayerMatches(index, true)">{{pl.name}}</a></div>
+            <!-- <div style="width: 200px"><a href="javascript:void(0)" (click)="getPlayerMatches(index, true)">{{pl.name}} - {{pl.tournaments[0].dt}}</a></div> -->
+            <div *ngIf="pl.nbrt" class="text-right" style="width: 120px">{{pl.nbrt}}</div>
+            <div *ngIf="!pl.nbrt" class="text-right" style="width: 120px"></div>
+            <div *ngIf="pl.matches" class="text-right" style="width: 80px">{{pl.matches}}</div>
+            <div *ngIf="pl.matches" class="text-right" style="width: 80px">{{pl.victories}}</div>
+            <div *ngIf="pl.matches" class="text-right" style="width: 80px; margin-left: 8px">{{pl.pctwin}}</div>
+            <div *ngIf="!pl.matches" class="text-right" style="width: 248px"></div>
+            <div *ngIf="allcls && pl.nbrtdbl" class="text-right" style="width: 120px">{{pl.nbrtdbl}}</div>
+            <div *ngIf="allcls && !pl.nbrtdbl" class="text-right" style="width: 120px"></div>
+            <div *ngIf="allcls && pl.matchesdbl" class="text-right" style="width: 80px">{{pl.matchesdbl}}</div>
+            <div *ngIf="allcls && pl.matchesdbl" class="text-right" style="width: 80px">{{pl.victoriesdbl}}</div>
+            <div *ngIf="allcls && pl.matchesdbl" class="text-right" style="width: 80px; margin-left: 8px">{{pl.pctwindbl}}</div>
+            <div *ngIf="allcls && !pl.matchesdbl" class="text-right" style="width: 240px"></div>
+            <div *ngIf="pl.expanded">
+              <div *ngIf="pl.imagename" style="margin-left: 5px"><img src="{{pl.imagename}}" width="100%" onerror="this.onerror=null"></div>
+              <div *ngFor="let pt of pl.tournaments; let index1=index;">
+                <div class="row">      
+                  <div *ngIf="turneringOK(pt)" class="row">
+                    <div class="tclass" style="width: 1000px; color: black; background-color: lightseagreen; margin-left: 50px">{{pt.dt}}&nbsp;{{pt.trn}}</div>
+                  </div>
+                  <!-- <div style="width: 250px; margin-left: 40px">{{pt.dt}}{{pt.trn}}</div> -->
+                  <div *ngFor="let kl of pt.klasser; let index2=index;">
+                    <!-- <div style="width: 250px; margin-left: 50px">{{kl.klasse}}</div> -->
+                    <div *ngIf="klasseOK(kl.klasse, true)" class="row">      
+                      <div class="tclass" style="color: black; background-color: lightgrey; margin-left: 50px">{{kl.klasse}}</div>
+                    </div>
+                    <div *ngIf="klasseOK(kl.klasse, true)" class="row">    
+                      <div *ngFor="let kamp of kl.kamper; let index3=index;">
+                        <div class="row">    
+                          <div *ngIf="!isDouble(kamp)">
+                            <div class="row">    
+                              <div style="width: 108px"></div>
+                              <div style="width: 50px;">{{kamp.r}}</div>
+                              <div style="width: 150px;">{{kamp.dt}}</div>
+                              <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 1 ? 'bold' : 'normal'}">{{kamp.p1}}</div>
+                              <div style="width: 20px">-</div>
+                              <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 2 ? 'bold' : 'normal'}">{{kamp.p2}}</div>
+                              <div style="width: 250px">
+                                <div *ngFor="let set of kamp.res; let index4=index;">
+                                  <div style="float: left; padding-right: 8px" [ngStyle]="{'padding-top': isDouble(kamp) ? '0.8em' : '0'}">{{removeWOName(set)}}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div *ngIf="isDouble(kamp)">
+                            <div class="card" style="margin-left: 86px">
+                              <div class="row" style="padding-left: 21px">    
+                                <div style="width: 50px; padding-top: 0.8em">{{kamp.r}}</div>
+                                <div style="width: 150px; padding-top: 0.8em">{{kamp.dt}}</div>
+                                <div>
+                                  <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 1 ? 'bold' : 'normal'}">{{kamp.p1}}</div>
+                                  <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 1 ? 'bold' : 'normal'}">{{kamp.p1b}}</div>
+                                </div>
+                                <div style="width: 20px">-</div>
+                                <div>
+                                  <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 2 ? 'bold' : 'normal'}">{{kamp.p2}}</div>
+                                  <div style="width: 220px" [ngStyle]="{'font-weight': winner(kamp) === 2 ? 'bold' : 'normal'}">{{kamp.p2b}}</div>
+                                </div>
+                                <div style="width: 250px">
+                                  <div *ngFor="let set of kamp.res; let index4=index;">
+                                    <div style="float: left; padding-right: 8px" [ngStyle]="{'padding-top': isDouble(kamp) ? '0.8em' : '0'}">{{removeWOName(set)}}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </td>
+    <td><img src="juvesen/assets/framside.jpg" width="75%"></td></tr>
+  </table>
+</div>
+<div *ngIf="option === '4'" style="font-size: 14px;">
+  <h5 style="padding-left: 30px">{{winners.length}} turneringer med {{this.matches}} kamper, men bonuskamper er ikke tatt med i grunnlaget for tabellene</h5>
+  <div class="row">
+    <div style="width: 700px">
+      <div class="row">      
+        <div style="width: 350px; padding-left: 40px"><strong>SEIERSPROSENT (minst
+          <a href="javascript:void(0)" (click)="decrTrnLimit(false)"><fa-icon [icon]="faCaretLeft"></fa-icon></a>
+          {{trnlimit}} 
+          <a href="javascript:void(0)" (click)="incrTrnLimit(false)"><fa-icon [icon]="faCaretRight"></fa-icon></a>
+          turneringer)</strong></div>
+        <div class="text-center" style="width: 360px"><strong>S I N G L E</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div *ngFor="let pl of mostWins; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.tournaments}}</div>
+          <div class="text-right" style="width: 80px">{{pl.matches}}</div>
+          <div class="text-right" style="width: 80px">{{pl.victories}}</div>
+          <div class="text-right" style="width: 80px; margin-left: 8px">{{round(pl.victories / pl.matches * 100)}}</div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="allcls" style="width: 700px">
+      <div class="row">      
+        <div style="width: 350px; padding-left: 40px"><strong>SEIERSPROSENT (minst
+          <a href="javascript:void(0)" (click)="decrTrnLimit(true)"><fa-icon [icon]="faCaretLeft"></fa-icon></a>
+          {{trnlimitdbl}} 
+          <a href="javascript:void(0)" (click)="incrTrnLimit(true)"><fa-icon [icon]="faCaretRight"></fa-icon></a>
+          turneringer)</strong></div>
+        <div class="text-center" style="width: 360px"><strong>D O U B L E</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div *ngFor="let pl of mostWinsdbl; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.tournamentsdbl}}</div>
+          <div class="text-right" style="width: 80px">{{pl.matchesdbl}}</div>
+          <div class="text-right" style="width: 80px">{{pl.victoriesdbl}}</div>
+          <div class="text-right" style="width: 80px; margin-left: 8px">{{round(pl.victoriesdbl / pl.matchesdbl * 100)}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div style="width: 700px">
+      <div class="row">      
+        <div style="padding-left: 40px"><strong>FLEST TURNERINGER</strong></div>
+        <div class="text-center" style="width: 360px"><strong>S I N G L E</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div *ngFor="let pl of mostTournaments; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.tournaments}}</div>
+          <div class="text-right" style="width: 80px">{{pl.matches}}</div>
+          <div class="text-right" style="width: 80px">{{pl.victories}}</div>
+          <div class="text-right" style="width: 80px; margin-left: 8px">{{round(pl.victories / pl.matches * 100)}}</div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="allcls" style="width: 700px">
+      <div class="row">      
+        <div style="padding-left: 40px"><strong>FLEST TURNERINGER</strong></div>
+        <div class="text-center" style="width: 360px"><strong>D O U B L E</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div *ngFor="let pl of mostTournamentsdbl; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.tournamentsdbl}}</div>
+          <div class="text-right" style="width: 80px">{{pl.matchesdbl}}</div>
+          <div class="text-right" style="width: 80px">{{pl.victoriesdbl}}</div>
+          <div class="text-right" style="width: 80px; margin-left: 8px">{{round(pl.victoriesdbl / pl.matchesdbl * 100)}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div style="width: 400px">
+      <div class="row">      
+        <div style="padding-left: 40px"><strong>LENGSTE TURNERINGSREKKE</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+      </div>
+      <div *ngFor="let pl of longestStreak; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.lstreak}}</div>
+        </div>
+      </div>
+    </div>
+    <div style="width: 400px; margin-left: 50px">
+      <div class="row">      
+        <div style="padding-left: 40px"><strong>LENGSTE PÅGÅENDE TURNERINGSREKKE</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+      </div>
+      <div *ngFor="let pl of longestCurrentStreak; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.cstreak}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div style="width: 700px">
+      <div class="row">      
+        <div style="width: 350px; padding-left: 40px"><strong>FLEST KAMPER</strong></div>
+        <div class="text-center" style="width: 360px"><strong>S I N G L E</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div *ngFor="let pl of mostMatches; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.tournaments}}</div>
+          <div class="text-right" style="width: 80px">{{pl.matches}}</div>
+          <div class="text-right" style="width: 80px">{{pl.victories}}</div>
+          <div class="text-right" style="width: 80px; margin-left: 8px">{{round(pl.victories / pl.matches * 100)}}</div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="allcls" style="width: 700px">
+      <div class="row">      
+        <div style="width: 350px; padding-left: 40px"><strong>FLEST KAMPER</strong></div>
+        <div class="text-center" style="width: 360px"><strong>D O U B L E</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Turneringer</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Kamper</strong></div>
+        <div class="text-right" style="width: 80px"><strong>Vunnet</strong></div>
+        <div class="text-right" style="width: 80px; margin-left: 8px"><strong>%</strong></div>
+      </div>
+      <div *ngFor="let pl of mostMatchesdbl; let index=index;">
+        <div *ngIf="index < 15" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{pl.name}}</div>
+          <div class="text-right" style="width: 120px">{{pl.tournamentsdbl}}</div>
+          <div class="text-right" style="width: 80px">{{pl.matchesdbl}}</div>
+          <div class="text-right" style="width: 80px">{{pl.victoriesdbl}}</div>
+          <div class="text-right" style="width: 80px; margin-left: 8px">{{round(pl.victoriesdbl / pl.matchesdbl * 100)}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div style="width: 1200px;">
+      <div class="row">      
+        <div style="padding-left: 40px"><strong>FLEST KAMPER MOT SAMME MOTSTANDER</strong></div>
+      </div>
+      <div class="row">      
+        <div class="text-right" style="width: 30px; margin-left: 25px"></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div style="width: 220px; margin-left: 25px"><strong>Navn</strong></div>
+        <div class="text-right" style="width: 120px"><strong>Kamper</strong></div>
+      </div>
+      <div *ngFor="let riv of mostRivalMatches; let index=index">
+        <div *ngIf="riv.nbrmatches >= mostRivalMatches[9].nbrmatches" class="row">      
+          <div class="text-right" style="width: 30px; margin-left: 25px">{{index + 1}}</div>
+          <div style="width: 220px; margin-left: 25px">{{riv.players[0]}}</div>
+          <div style="width: 220px; margin-left: 25px">{{riv.players[1]}}</div>
+          <div class="text-right" style="width: 120px">{{riv.nbrmatches}}</div>
+          <div *ngFor="let kamp of riv.matches; let index=index">
+            <div class="row" style="margin-left: 100px">
+              <div class="text-right" style="width: 30px; margin-left: 25px; margin-right: 25px">{{index + 1}}</div>
+              <div style="width: 150px; margin-left: 80px">{{kamp.kamp.dt}}</div>
+              <div style="width: 300px;">{{kamp.trn}}, {{kamp.klasse}} - {{kamp.kamp.r}}</div>
+              <div [ngStyle]="{'font-weight': winner(kamp.kamp) === 1 ? 'bold' : 'normal'}">{{kamp.kamp.p1}}</div>
+              <div style="margin-left: 8px; margin-right: 8px">-</div>
+              <div style="margin-right: 16px" [ngStyle]="{'font-weight': winner(kamp.kamp) === 2 ? 'bold' : 'normal'}">{{kamp.kamp.p2}}</div>
+              <div *ngFor="let set of kamp.kamp.res;">
+                <div style="float: left; padding-right: 8px">{{removeWOName(set)}}</div>
+              </div>
+            </div>
+          </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div style="width: 1200px;">
+      <div class="row">
+        <div style="width: 350px; padding-left: 40px"><strong>JEVNESTE SINGLEKAMPER</strong></div>
+      </div>
+      <div *ngFor="let kamp of closetiebreaks; let index=index;">
+        <div *ngIf="index < 15">
+          <div class="card">
+            <div class="row">    
+              <div class="text-right" style="width: 30px; margin-left: 25px; margin-right: 25px">{{index + 1}}</div>
+              <div style="width: 150px;">{{kamp.trn}}</div>
+              <div style="width: 150px;">{{kamp.cls}}</div>
+              <div style="width: 220px" [ngStyle]="{'font-weight': winnerTB(kamp.kamp) === 1 ? 'bold' : 'normal'}">{{kamp.kamp.p1}}</div>
+              <div style="width: 20px">-</div>
+              <div style="width: 220px" [ngStyle]="{'font-weight': winnerTB(kamp.kamp) === 2 ? 'bold' : 'normal'}">{{kamp.kamp.p2}}</div>
+              <div style="width: 200px">
+                <div *ngFor="let set of kamp.kamp.res;">
+                  <div style="float: left; padding-right: 8px">{{removeWOName(set)}}</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">    
+              <div style="width: 150px; margin-left: 80px">{{kamp.kamp.dt}}</div>
+              <div style="width: 150px;">{{kamp.kamp.r}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 8px">
+    <div style="width: 1400px;">
+      <div *ngIf="allcls" class="row">
+        <div style="width: 350px; padding-left: 40px"><strong>JEVNESTE DOUBLEKAMPER</strong></div>
+      </div>
+      <div *ngFor="let kamp of closetiebreaksdbl; let index=index;">
+        <div *ngIf="index < 15">
+          <div class="card">
+            <div class="row">    
+              <div class="text-right" style="width: 30px; margin-left: 25px; margin-right: 25px">{{index + 1}}</div>
+              <div style="width: 150px;">{{kamp.trn}}</div>
+              <div style="width: 150px;">{{kamp.cls}}</div>
+              <div style="width: 220px" [ngStyle]="{'font-weight': winnerTB(kamp.kamp) === 1 ? 'bold' : 'normal'}">{{kamp.kamp.p1}}</div>
+              <div style="width: 20px">-</div>
+              <div style="width: 220px" [ngStyle]="{'font-weight': winnerTB(kamp.kamp) === 2 ? 'bold' : 'normal'}">{{kamp.kamp.p2}}</div>
+              <div style="width: 200px">
+                <div *ngFor="let set of kamp.kamp.res;">
+                  <div style="float: left; padding-right: 8px;">{{removeWOName(set)}}</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">    
+              <div style="width: 150px; margin-left: 80px">{{kamp.kamp.dt}}</div>
+              <div style="width: 150px;">{{kamp.kamp.r}}</div>
+              <div style="width: 220px" [ngStyle]="{'font-weight': winnerTB(kamp.kamp) === 1 ? 'bold' : 'normal'}">{{kamp.kamp.p1b}}</div>
+              <div style="width: 20px">&nbsp;</div>
+              <div style="width: 220px" [ngStyle]="{'font-weight': winnerTB(kamp.kamp) === 2 ? 'bold' : 'normal'}">{{kamp.kamp.p2b}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
