@@ -3,7 +3,9 @@
 # import xlsxwriter
 import csv
 
-CUPNAME = 'Farmers cup 2023'
+# CUPNAME = 'Farmers cup 2015'
+# CUPNAME = 'Potato Open 2015'
+CUPNAME = 'Bankers Open 2022'
 
 
 def getValue1(match, s):
@@ -75,7 +77,8 @@ def getMatches(filename, dt):
                 players = m.split('/player.aspx')
                 results = players[-1:][0].split('"match__result">')
                 points = results[1].split('<li class="points__cell')
-                comment = ''            
+                comment = ''
+                mwo = 0
                 for p in players[1:]:
                     pl, s = getValue1(p, 0)
                     pl = fix(pl)
@@ -99,7 +102,7 @@ def getMatches(filename, dt):
                             resultsets.append(f'{r1}-{res}')
                             r1 = -1
                     if r1 > -1:
-                        resultsets.append(f'{r1}-{res}')                    
+                        resultsets.append(f'{r1}-{res}')
                     result = ' '.join(resultsets)
                 # finn bane
                 court = ''

@@ -16,7 +16,7 @@ interface LooseObject {
 })
 
 export class AppComponent implements OnInit {
-  title = 'Juvesen';
+  title = 'Farmers & Potato';
   runnerup: boolean;
   nl = [];
   t_idx = 0;
@@ -25,14 +25,15 @@ export class AppComponent implements OnInit {
   nm_idx = 0;
   matches = 0;
   names = [];
-  trnlimit = 8;
-  trnlimitdbl = 8;
+  trnlimit = 4;
+  trnlimitsgl = 4;
+  trnlimitdbl = 4;
   players = [];
   winners = [];
   option = '1';
   detail = '1';
   filter = '';
-  allcls = true;
+  allcls = false;
   closetiebreaks = [];
   closetiebreaksdbl = [];
   toplist = [];
@@ -48,13 +49,13 @@ export class AppComponent implements OnInit {
   mostMatchesdbl = [];
   topRivals = [];
   mostRivalMatches = [];
-faAngleDown = faAngleDown;
+  faAngleDown = faAngleDown;
   faAngleUp = faAngleUp;
   faCaretLeft = faCaretLeft;
   faCaretRight = faCaretRight;
   faFileImage = faFileImage;
   sortbyfirstname = false;
-  labels = {lblc: 'Klasse C', lbld: 'Klasse D', lble: 'Klasse E', lblf: 'Klasse F'};
+  labels = {lbld: 'Klasse D', lble: 'Klasse E', lblf: 'Klasse F'};
 
   filterPlayer(index) {
     if (!this.filter) {
@@ -721,12 +722,12 @@ faAngleDown = faAngleDown;
     }
   }
 
-  pureJuvesen() {
-    if (this.allcls) {
-      this.allcls = false;
-      this.lagPlasseringer();
-    }
-  }
+  // pureJuvesen() {
+  //   if (this.allcls) {
+  //     this.allcls = false;
+  //     this.lagPlasseringer();
+  //   }
+  // }
 
   pushNames(names, w, f, sf1, sf2, ix, lbl='') {
     if (lbl && lbl.indexOf('U12') === -1) {

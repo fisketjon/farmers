@@ -4,7 +4,7 @@
 
 <div style="width: 2200px;">
   <div class="row">
-    <div style="padding-left: 30px; width:150; font-size: 36px">Juvesen</div>
+    <div style="padding-left: 30px; width:150; font-size: 36px">Farmers/Bankers/Potato</div>
     <div class="row" style="width: 1400px; margin-top: 10px">
       <div style="width: 70px; margin-left: 150px">Visning:</div>
       <div><button style="width: 100px; margin-right: 8px" [ngStyle]="{'background-color': option === '1' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="option='1'">Turneringer</button></div>
@@ -19,9 +19,9 @@
           <div><button style="width: 70px; margin-right: 30px" [ngStyle]="{'background-color': detail === '3' ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="detail='3'">Topp 3</button></div>
         </div>
       </div>
-      <div style="width: 70px;">Klasser:</div>
+      <!-- <div style="width: 70px;">Klasser:</div>
       <div><button style="width: 50px; margin-right: 8px" [ngStyle]="{'background-color': allcls ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="allClasses()">Alle</button></div>
-      <div><button style="width: 120px; margin-right: 8px" [ngStyle]="{'background-color': !allcls ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="pureJuvesen()">Kun A-F single</button></div>
+      <div><button style="width: 120px; margin-right: 8px" [ngStyle]="{'background-color': !allcls ? 'blue' : 'lightgrey'}" class="btn btn-primary btn-sm" type="button" (click)="pureJuvesen()">Kun A-F single</button></div> -->
     </div>
   </div>
 </div>
@@ -78,7 +78,7 @@
             </td>
           </div>
           <td class="card noborder" [hidden]="!obj.c">
-            <div class="tclass">{{labels.lblc}}</div>
+            <div class="tclass">{{obj.lblc}}</div>
             <div class="card gold player" style="margin-top: 0px;">{{obj.c}}</div>
             <div class="silver player" style="margin-top: 0px;" [hidden]="detail<'2'">2. {{obj.c2}}</div>
             <div class="bronze player2" style="margin-top: 0px;" [hidden]="detail<'3' || !obj.c3a">3. {{obj.c3a}}</div>
@@ -278,7 +278,7 @@ F  - Finale
 </div>
 <div *ngIf="option === '2'">
   <div class="row">
-      <div [ngStyle]="{'width': allcls ? '810px' : '690px'}">
+      <div [ngStyle]="{'width': allcls ? '810px' : '480px'}">
       <table style="width: 100%;">
           <tr>
             <div class="row" style="padding-left:30px">
@@ -286,11 +286,11 @@ F  - Finale
               <td style="width: 60px" class="text-center">A</td>
               <td style="width: 60px; margin-left: 8px" class="text-center">B</td>
               <td style="width: 60px; margin-left: 8px" class="text-center">C</td>
-              <td style="width: 60px; margin-left: 8px" class="text-center">D</td>
+              <!-- <td style="width: 60px; margin-left: 8px" class="text-center">D</td>
               <td style="width: 60px; margin-left: 8px" class="text-center">E</td>
               <td style="width: 60px; margin-left: 8px" class="text-center">F</td>
               <td [hidden]="!allcls" style="width: 60px; margin-left: 8px" class="text-center">U12</td>
-              <td [hidden]="!allcls" style="width: 60px; margin-left: 8px" class="text-center">U10</td>
+              <td [hidden]="!allcls" style="width: 60px; margin-left: 8px" class="text-center">U10</td> -->
               <td style="width: 30px; margin-left: 8px" class="text-center">Tot</td>
             </div>
           </tr>
@@ -308,7 +308,7 @@ F  - Finale
                 <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[6]}}</td>
                 <td style="width: 20px" class="silver text-center">{{obj.victories[7]}}</td>
                 <td style="width: 20px" class="bronze text-center">{{obj.victories[8]}}</td>
-                <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[9]}}</td>
+                <!-- <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[9]}}</td>
                 <td style="width: 20px" class="silver text-center">{{obj.victories[10]}}</td>
                 <td style="width: 20px" class="bronze text-center">{{obj.victories[11]}}</td>
                 <td style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[12]}}</td>
@@ -322,7 +322,7 @@ F  - Finale
                 <td [hidden]="!allcls" style="width: 20px" class="bronze text-center">{{obj.victories[20]}}</td>
                 <td [hidden]="!allcls" style="width: 20px; margin-left: 8px" class="gold text-center">{{obj.victories[21]}}</td>
                 <td [hidden]="!allcls" style="width: 20px" class="silver text-center">{{obj.victories[22]}}</td>
-                <td [hidden]="!allcls" style="width: 20px" class="bronze text-center">{{obj.victories[23]}}</td>
+                <td [hidden]="!allcls" style="width: 20px" class="bronze text-center">{{obj.victories[23]}}</td> -->
                 <td style="width: 30px; margin-left: 4px" class="text-right">{{obj.tot}}</td>
               </div>
             </tr>
@@ -333,13 +333,13 @@ F  - Finale
     <div style="width: calc(100% - 860px); padding-top: 20px">
       <div id="plasseringer" class="carousel slide" data-ride="carousel" data-interval="1000">
         <!-- Indicators -->
-        <ul class="carousel-indicators">
+        <!-- <ul class="carousel-indicators">
           <li data-target="#plasseringer" data-slide-to="0" class="active"></li>
           <li data-target="#plasseringer" data-slide-to="1"></li>
-        </ul>
+        </ul> -->
 
         <!-- The slideshow -->
-        <div class="carousel-inner">
+        <!-- <div class="carousel-inner">
           <div class="carousel-item active">
             <img src="juvesen/assets/20180427_152609_0001_7D_0009621_693.jpg" width="100%" alt="Rikhard Holmström">
             <div class="carousel-caption">
@@ -354,15 +354,15 @@ F  - Finale
               <p>Juvesen Høstcup 2019</p>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Left and right controls -->
-        <a class="carousel-control-prev" href="#plasseringer" data-slide="prev">
+        <!-- <a class="carousel-control-prev" href="#plasseringer" data-slide="prev">
           <span class="carousel-control-prev-icon"></span>
         </a>
         <a class="carousel-control-next" href="#plasseringer" data-slide="next">
           <span class="carousel-control-next-icon"></span>
-        </a>
+        </a> -->
       </div>
     </div>
   </div>
@@ -474,7 +474,7 @@ F  - Finale
         </div>
       </div>
     </td>
-    <td><img src="juvesen/assets/framside.jpg" width="75%"></td></tr>
+    <!-- <td><img src="juvesen/assets/framside.jpg" width="75%"></td></tr> -->
   </table>
 </div>
 <div *ngIf="option === '4'" style="font-size: 14px;">
